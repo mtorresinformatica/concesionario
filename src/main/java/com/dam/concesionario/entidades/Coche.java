@@ -1,5 +1,7 @@
 package com.dam.concesionario.entidades;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,7 +12,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "dam_coches")
-class Coche {
+class Coche implements Serializable{
 
 	/** SERIAL ID */
 	private static final long serialVersionUID = 1L;
