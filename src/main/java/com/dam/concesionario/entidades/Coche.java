@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "dam_coches")
-class Coche implements Serializable{
+public class Coche implements Serializable{
 
 	/** SERIAL ID */
 	private static final long serialVersionUID = 1L;
