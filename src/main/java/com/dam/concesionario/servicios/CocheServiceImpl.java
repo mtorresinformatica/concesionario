@@ -3,10 +3,12 @@ package com.dam.concesionario.servicios;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.dam.concesionario.entidades.Coche;
 import com.dam.concesionario.repositorio.CocheRepositorioI;
 
+@Service
 public class CocheServiceImpl implements CocheServiceI{
 
 	@Autowired
@@ -19,7 +21,7 @@ public class CocheServiceImpl implements CocheServiceI{
 
 	@Override
 	public Coche obtenerCochePorMatricula(String matricula) {
-		final Coche coche = (Coche) cocheRepositorio.findByMatricula(matricula);
+		final Coche coche = cocheRepositorio.findByMatricula(matricula);
 		return coche;
 	}
 

@@ -10,7 +10,7 @@ import com.dam.concesionario.entidades.*;
 @Repository
 public interface CocheRepositorioI extends JpaRepository<Coche, Long> {
 	
-	List<Coche> findByMatricula(String matricula);
+	Coche findByMatricula(String matricula);
 	
 	List <Coche> findByMarcaOrModelo(final String Marca, final String Modelo);
 	
