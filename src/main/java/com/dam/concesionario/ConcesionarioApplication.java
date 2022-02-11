@@ -15,8 +15,8 @@ import com.dam.concesionario.servicios.CocheServiceI;
 public class ConcesionarioApplication implements CommandLineRunner {
 
 	/** Servicio: Gestión de vehículos */
-	@Autowired
-	private CocheServiceI cocheServiceI;
+//	@Autowired
+//	private CocheServiceI cocheServiceI;
 
 	public static void main(String[] args) {
 		SpringApplication.run(ConcesionarioApplication.class, args);
@@ -25,42 +25,42 @@ public class ConcesionarioApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		System.out.println("------------");
+	//	System.out.println("------------");
 
 		//Obtención e iteración de elementos.
-		final List<Coche> CarList = cocheServiceI.obtenerTodosCoches();
-		if (!CollectionUtils.isEmpty(CarList)) {
-			for (Coche coche : CarList) {
-				System.out.println(coche.toString());
-			}
-		}
-		
-		System.out.println("------------");
+//		final List<Coche> CarList = cocheServiceI.obtenerTodosCoches();
+//		if (!CollectionUtils.isEmpty(CarList)) {
+//			for (Coche coche : CarList) {
+//				System.out.println(coche.toString());
+//			}
+//		}
+//		
+//		System.out.println("------------");
 				
 		// Obtención e iteración de elementos.
-		final List<Coche> CarMarOMod = cocheServiceI.obtenerCochePorMarcaOModelo("Ford", "León");
-		if (!CollectionUtils.isEmpty(CarMarOMod)) {
-			for (Coche coche : CarMarOMod) {
-				System.out.println(coche.toString());
-			}
-		}
-		
-		 System.out.println("------------");
+//		final List<Coche> CarMarOMod = cocheServiceI.obtenerCochePorMarcaOModelo("Ford", "León");
+//		if (!CollectionUtils.isEmpty(CarMarOMod)) {
+//			for (Coche coche : CarMarOMod) {
+//				System.out.println(coche.toString());
+//			}
+//		}
+//		
+//		 System.out.println("------------");
 		
 		 //Búsqueda por matrícula.
-		final Coche cochePorMatricula = cocheServiceI.obtenerCochePorMatricula("1986-HBU");
-		System.out.println(cochePorMatricula.toString());
+//		final Coche cochePorMatricula = cocheServiceI.obtenerCochePorMatricula("1986-HBU");
+//		System.out.println(cochePorMatricula.toString());
 		
 		//Eliminar coche por Id
-		cocheServiceI.eliminarCochePorId(cochePorMatricula.getId());
+//		cocheServiceI.eliminarCochePorId(cochePorMatricula.getId());
 				
 		//Añadir un coche
-		Coche car = new Coche();
-		car.setMatricula("0000 AAA");
-		car.setMarca("Opel");
-		car.setModelo("Astra");
-				
-		cocheServiceI.aniadirCoche(car);
+//		Coche car = new Coche();
+//		car.setMatricula("0000 AAA");
+//		car.setMarca("Opel");
+//		car.setModelo("Astra");
+//				
+//		cocheServiceI.aniadirCoche(car);
 
 	}
 
