@@ -1,115 +1,102 @@
 package com.dam.concesionario.controladores;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import javax.naming.spi.DirStateFactory.Result;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.dam.concesionario.entidades.Coche;
+import com.dam.concesionario.errores.ApiError;
+import com.dam.concesionario.errores.CocheNotFoundException;
 import com.dam.concesionario.servicios.CocheServiceI;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
-@Controller
+import lombok.RequiredArgsConstructor;
+
+@RestController
 public class CocheController {
 
 	@Autowired
 	private CocheServiceI cocheServiceI;
 
-	@RequestMapping("/home")
-	@ResponseBody
-	public String home() {
-		return "hello world";
-	}
-
-	@GetMapping("/showCarsView")
-	public String mostrarCoches(Model model) {
-
+	//Mostrar todos los coches
+	@GetMapping("/mostrarCoches")
+	public ResponseEntity<?> mostrarCoches() {
 		// Obtención de vehículos
 		final List<Coche> listaCoches = cocheServiceI.obtenerTodosCoches();
 
-		// Carga de datos al modelo
-		model.addAttribute("carsListView", listaCoches);
-		model.addAttribute("btnDropCarEnabled", Boolean.FALSE);
-
-		return "showCars";
-	}
-
-	@PostMapping("/actDropCar")
-	public String eliminarCoche(@RequestParam String carId, Model model) {
-
-		// Eliminación de vehículo
-		cocheServiceI.eliminarCochePorId(Long.valueOf(carId));
-
-		return "redirect:showCarsView";
-
-	}
-
-	@PostMapping("/actSearchCar")
-	public String submitBuscarCocheForm(@ModelAttribute Coche searchedCar, Model model) throws Exception {
-
-		List<Coche> listaCoches = new ArrayList<Coche>();
-		
-		System.out.println(searchedCar.getMarca());
-
-		final String cocheMatricula = searchedCar.getMatricula();
-		final String cocheMarca = searchedCar.getMarca();
-		final String cocheModelo = searchedCar.getModelo();
-
-		System.out.println(cocheMatricula);
-		if (StringUtils.hasText(cocheMatricula)) {
-
-			// Búsqueda por matrícula
-			final Coche coche = cocheServiceI.obtenerCochePorMatricula(cocheMatricula);
-
-			if (coche != null) {
-				listaCoches.add(coche);
-			}
-		} else if (!StringUtils.hasText(cocheMatricula)
-				&& (StringUtils.hasText(cocheMarca) || StringUtils.hasText(cocheModelo))) {
-
-			// Búsqueda por marca o modelo
-			listaCoches = cocheServiceI.obtenerCochePorMarcaOModelo(cocheMarca, cocheModelo);
-
-		} else if (!StringUtils.hasText(cocheMatricula)
-				&& (StringUtils.hasText(cocheMarca) && StringUtils.hasText(cocheModelo))) {
-
-			listaCoches = cocheServiceI.obtenerCochePorMarcaYModelo(cocheMarca, cocheModelo);
-
+		if (listaCoches.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No hay productos registrados");
 		} else {
-			throw new Exception("Parámetros de búsquieda erróneos.");
+			return ResponseEntity.ok(listaCoches);
 		}
+	}
 
-		// Carga de datos al modelo
-		model.addAttribute("carsListView", listaCoches);
-		model.addAttribute("btnDropCarEnabled", Boolean.TRUE);
+	//Mostrar coche por id
+	@GetMapping("/coche/{id}")
+	public Coche mostrarCoche(@PathVariable Long id) {
 
-		return "showCars";
+			return cocheServiceI.obtenerCoche(id).orElseThrow(() -> new CocheNotFoundException(id));
 
 	}
 
-	@PostMapping("/actAddCar")
-	private String aniadirCoche(@Valid @ModelAttribute Coche newCar, BindingResult result) throws Exception {
+	//Añadir un coche
+	@PostMapping("/coche")
+	public ResponseEntity<?> aniadirCoche(@RequestBody Coche newCar) throws Exception {
 
-		if (result.hasErrors()) {
-			throw new Exception("Parámetros de matriculación erróneos");
-		} else {
+		Coche nuevoCoche = new Coche();
+		nuevoCoche.setMatricula(newCar.getMatricula());
+		nuevoCoche.setMarca(newCar.getMarca());
+		nuevoCoche.setModelo(newCar.getModelo());
 
-			// Se añade el nuevo coche
-			cocheServiceI.aniadirCoche(newCar);
-		}
+		return ResponseEntity.status(HttpStatus.CREATED).body(cocheServiceI.aniadirCoche(newCar));
+	}
 
-		return "redirect:showCarsView";
+	//Actualizar coche por id
+	@PutMapping("/coche/{id}")
+	public Coche actualizarCoche(@RequestBody Coche cocheEditado, @PathVariable Long id) {
+
+		return cocheServiceI.obtenerCoche(id).map(p -> {
+			p.setMatricula(cocheEditado.getMatricula());
+			p.setMarca(cocheEditado.getMarca());
+			p.setModelo(cocheEditado.getModelo());
+			return cocheServiceI.aniadirCoche(p);
+		}).orElseThrow(() -> new CocheNotFoundException(id));
+	}
+
+	//Eliminar coche por id
+	@DeleteMapping("/coche/{id}")
+	public ResponseEntity<?> eliminarCoche(@PathVariable Long id) {
+
+		Coche coche = cocheServiceI.obtenerCoche(id)
+				.orElseThrow(()-> new CocheNotFoundException(id));
+		cocheServiceI.eliminarCochePorId(id);
+		return ResponseEntity.noContent().build();
+
 	}
 
 }

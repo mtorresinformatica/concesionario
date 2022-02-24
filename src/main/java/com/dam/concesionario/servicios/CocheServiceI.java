@@ -1,22 +1,23 @@
 package com.dam.concesionario.servicios;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.dam.concesionario.entidades.Coche;
 
 public interface CocheServiceI {
 
 	public List<Coche> obtenerTodosCoches();
-
-	public Coche obtenerCochePorMatricula(final String Matricula);
-
-	public List<Coche> obtenerCochePorMarcaOModelo(final String Marca, final String Modelo);
-
-	public List<Coche> obtenerCochePorMarcaYModelo(final String Marca, final String Modelo);
-
+	
+	public Optional<Coche> obtenerCoche(final Long id);
+	
 	public void eliminarCochePorId(final long IdCoche);
 
-	public void aniadirCoche(final Coche coche);
+	public Coche aniadirCoche(final Coche coche);
 
 	public void actualizarCoche(final Coche coche);
+	
+	public boolean existeCochePorId(final Long id);
+	
+	
 }

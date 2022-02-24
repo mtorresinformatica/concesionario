@@ -1,6 +1,7 @@
 package com.dam.concesionario.servicios;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,21 +20,6 @@ public class CocheServiceImpl implements CocheServiceI{
 		return cocheRepositorio.findAll();
 	}
 
-	@Override
-	public Coche obtenerCochePorMatricula(String matricula) {
-		final Coche coche = cocheRepositorio.findByMatricula(matricula);
-		return coche;
-	}
-
-	@Override
-	public List<Coche> obtenerCochePorMarcaOModelo(String Marca, String Modelo) {
-		return cocheRepositorio.findByMarcaOrModelo(Marca, Modelo);
-	}
-
-	@Override
-	public List<Coche> obtenerCochePorMarcaYModelo(String Marca, String Modelo) {
-		return cocheRepositorio.findByMarcaAndModelo(Marca, Modelo);
-	}
 
 	@Override
 	public void eliminarCochePorId(long IdCoche) {
@@ -41,15 +27,26 @@ public class CocheServiceImpl implements CocheServiceI{
 	}
 
 	@Override
-	public void aniadirCoche(Coche coche) {
-		cocheRepositorio.save(coche);	
+	public Coche aniadirCoche(Coche coche) {
+		return cocheRepositorio.save(coche);	
 	}
 
 	@Override
 	public void actualizarCoche(Coche coche) {
 		cocheRepositorio.save(coche);
 	}
-	
-	
+
+	@Override
+	public Optional<Coche> obtenerCoche(Long id) {
+		
+		return cocheRepositorio.findById(id);
+		 
+	}
+
+	@Override
+	public boolean existeCochePorId(Long id) {
+		return cocheRepositorio.existsById(id);
+		
+	}
 
 }
